@@ -20,14 +20,21 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: mbstring, bcmath, pdo, mysql
+          php-version: 8.2
+          extensions: mbstring, bcmath, pdo_mysql, intl, xml, ctype, json
+          coverage: none
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist
+      - name: Copy .env
+        run: cp .env.example .env
 
-      - name: Generate Key
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate App Key
         run: php artisan key:generate
 
-      - name: Check syntax
-        run: php -l app/Http/Controllers/MovieController.php
+      - name: Run Laravel Tests
+        run: php artisan test
+
+      - name: Check PHP Syntax (optional)
+        run: find app -name "*.php" -exec php -l {} \;
